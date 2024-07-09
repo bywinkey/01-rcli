@@ -6,7 +6,15 @@ fn main() -> anyhow::Result<()> {
     let opts: Opts = Opts::parse();
     // println!("{:?}", opts);
     match opts.cmd {
-        SubCommand::Csv(opts) => process_csv(&opts.input, &opts.output)?,
+        SubCommand::Csv(opts) => {
+            let output = if let Some(output) = opts.output {
+                output.clone()
+            } else {
+                // "output.json".into(),以{} format一个数据结构的话，那么这个数据结构就需要实现 Display Trait
+                format!("output.{}", opts.format)
+            };
+            process_csv(&opts.input, &output, opts.format)?;
+        }
     }
     Ok(())
 }
