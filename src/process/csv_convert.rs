@@ -5,7 +5,8 @@ use csv::Reader;
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
 
-use crate::opts::OutputFormat;
+// crate 关键字确保你从包的根模块开始，避免路径解析上的混淆。
+use crate::cli::OutputFormat;
 
 #[derive(Debug, Deserialize, Serialize)]
 #[serde(rename_all = "PascalCase")] // 使用标注，来制定整个struct的 rename

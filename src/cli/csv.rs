@@ -1,24 +1,8 @@
+use std::{fmt, str::FromStr};
+
 use clap::Parser;
-use std::{fmt, path::Path, str::FromStr};
-
-#[derive(Debug, Parser)]
-#[command(name = "rcli", version, author, about, long_about = None)]
-pub struct Opts {
-    #[command(subcommand)]
-    pub cmd: SubCommand,
-}
-
-#[derive(Debug, Parser)]
-pub enum SubCommand {
-    #[command(
-        name = "csv",
-        about = "Show CSV files, or convert csv to other formats"
-    )]
-    Csv(CsvOpts),
-
-    #[command(name = "genpass", about = "Generate a password")]
-    GenPass(GenPassOpt),
-}
+// 使用上层的包
+use super::verify_input_file;
 
 #[derive(Debug, Clone, Copy)]
 pub enum OutputFormat {
@@ -50,33 +34,6 @@ pub struct CsvOpts {
     // 参见详细的提示 Short option names must be unique for each argument, but '-h' is in use by both 'header' and 'help'
     #[arg(long, default_value_t = true)]
     pub header: bool,
-}
-
-#[derive(Debug, Parser)]
-pub struct GenPassOpt {
-    #[arg(short, long, default_value_t = 16)] // 16 是一个默认值，表示生成的密码的长度
-    pub length: u8,
-
-    #[arg(long, default_value_t = true)] // 默认支持大写字母
-    pub uppercase: bool,
-
-    #[arg(long, default_value_t = true)] // 默认支持小写字母
-    pub lowercase: bool,
-
-    #[arg(long, default_value_t = true)] // 默认支持数字
-    pub numbers: bool,
-
-    #[arg(long, default_value_t = true)] // 默认支持特殊字符
-    pub symbols: bool,
-}
-
-fn verify_input_file(filename: &str) -> Result<String, String> {
-    // 实例化成Path结构，调用Path结构的 exists方法
-    if Path::new(filename).exists() {
-        Ok(filename.into()) //这里为什么不能使用`;` 这个（在 Rust 中，分号 (;) 用于终止语句。然而，当一个表达式的值需要从函数返回时，不能使用分号。）
-    } else {
-        Err("File does not exist.".into())
-    }
 }
 
 fn parser_format(format: &str) -> Result<OutputFormat, anyhow::Error> {
