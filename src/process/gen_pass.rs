@@ -1,6 +1,5 @@
 use anyhow::Ok;
 use rand::seq::SliceRandom;
-use zxcvbn::zxcvbn; //zxcvbn 密码强壮性校验工具
 
 // 生命周期为static
 const UPPER: &[u8] = b"ABCDEFGHJKLMNPQRSTUVWXYZ";
@@ -14,7 +13,7 @@ pub fn process_genpass(
     lower: bool,
     number: bool,
     symbol: bool,
-) -> anyhow::Result<()> {
+) -> anyhow::Result<String> {
     let mut rng = rand::thread_rng();
     // let mut password = String::new(); // shuffle  不支持String，因此这里修改成Vec
     let mut password = Vec::new();
@@ -70,9 +69,7 @@ pub fn process_genpass(
     password.shuffle(&mut rng);
 
     let password_result = String::from_utf8(password)?;
-    println!("gen_pass result is:【{}】", password_result);
+    // println!("{}", password_result);
     // output password strength in stderr
-    let estimate = zxcvbn(&password_result, &[]);
-    eprintln!("Password strength: {}", estimate.score()); // 3
-    Ok(())
+    Ok(password_result)
 }

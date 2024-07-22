@@ -1,4 +1,4 @@
-use super::verify_input_file;
+use super::verify_file;
 use clap::Parser;
 use core::fmt;
 use std::str::FromStr;
@@ -14,7 +14,7 @@ pub enum Base64SubCommand {
 #[derive(Debug, Parser)]
 pub struct Base64EncodeOpts {
     // - 代表input是从stdin读取进来的数据
-    #[arg(short, long, value_parser = verify_input_file, default_value = "-")]
+    #[arg(short, long, value_parser = verify_file, default_value = "-")]
     pub input: String,
 
     // base64编码格式的类型，分别为 Standard, UrlSafe,
@@ -24,7 +24,7 @@ pub struct Base64EncodeOpts {
 
 #[derive(Debug, Parser)]
 pub struct Base64DecodeOpts {
-    #[arg(short, long, value_parser = verify_input_file, default_value = "-")]
+    #[arg(short, long, value_parser = verify_file, default_value = "-")]
     pub input: String,
 
     // base64编码格式的类型，分别为 Standard, UrlSafe,

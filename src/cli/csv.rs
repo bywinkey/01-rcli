@@ -2,7 +2,7 @@ use std::{fmt, str::FromStr};
 
 use clap::Parser;
 // 使用上层的包
-use super::verify_input_file;
+use super::verify_file;
 
 #[derive(Debug, Clone, Copy)]
 pub enum OutputFormat {
@@ -15,7 +15,7 @@ pub enum OutputFormat {
 #[derive(Debug, Parser)]
 pub struct CsvOpts {
     // 定义一个参数，为必填项， 支持短参数，长参数，以及提示
-    #[arg(short, long, value_parser = verify_input_file)]
+    #[arg(short, long, value_parser = verify_file)]
     pub input: String,
     // 定义输出路径 // default_value 是实现了一个 From Trait 的因此，如果你返回的东西是直接返回字面量，就使用 default_value_t
     // 默认使用了 "output.json".info() 将 &str convert成了 String::from("output.json") 的这样一个堆内存变量
