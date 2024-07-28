@@ -1,0 +1,11 @@
+### test htllo world
+GET http://127.0.0.1:8099 HTTP/1.1
+
+### 每一个请求之间，使用 ### 分隔开
+GET http://127.0.0.1:8099/abc.txt HTTP/1.1
+
+#### serve一个文件
+GET http://127.0.0.1:8099/Cargo.toml HTTP/1.1
+
+###
+GET http://127.0.0.1:8099/fixtures/blake3.txt HTTP/1.1

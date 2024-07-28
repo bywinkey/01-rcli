@@ -1,13 +1,16 @@
 use clap::Parser;
 use rcli::{
-    process_csv, process_decode, process_encode, process_genpass, process_text_generate,
-    process_text_sign, process_text_verify, Base64SubCommand, Opts, SubCommand, TextSignFormat,
-    TextSubCommand,
+    process_csv, process_decode, process_encode, process_genpass, process_http_serve,
+    process_text_generate, process_text_sign, process_text_verify, Base64SubCommand,
+    HttpSubCommand, Opts, SubCommand, TextSignFormat, TextSubCommand,
 };
 use std::fs;
 use zxcvbn::zxcvbn; //zxcvbn 密码强壮性校验工具
 
-fn main() -> anyhow::Result<()> {
+#[tokio::main]
+async fn main() -> anyhow::Result<()> {
+    // 初始化一个 tracing_subscriber 对系统运行时的信息诊断做监控，以输出到控制台
+    tracing_subscriber::fmt::init();
     let opts: Opts = Opts::parse();
     // println!("{:?}", opts);
     match opts.cmd {
@@ -71,6 +74,12 @@ fn main() -> anyhow::Result<()> {
                         fs::write(name.join("ed25519.pk"), &key[1])?;
                     }
                 }
+            }
+        },
+        SubCommand::Http(subcmd) => match subcmd {
+            HttpSubCommand::Serve(opts) => {
+                println!("Serving at http://127.0.0.1:{}", opts.port);
+                process_http_serve(opts.dir, opts.port).await?;
             }
         },
     }
