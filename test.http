@@ -9,3 +9,18 @@ GET http://127.0.0.1:8099/Cargo.toml HTTP/1.1
 
 ###
 GET http://127.0.0.1:8099/fixtures/blake3.txt HTTP/1.1
+
+### tower-http
+GET http://127.0.0.1:8099/Cargo.toml HTTP/1.1
+Range: bytes=0-
+Accept-Encoding: gzip
+
+### byte
+GET http://127.0.0.1:8099/fixtures/blake3.txt HTTP/1.1
+Range: bytes=0-
+Accept-Encoding: gzip
+
+### request directory
+GET http://127.0.0.1:8099/tower/fixtures/ed25519.sk HTTP/1.1
+Range: bytes=0-
+Accept-Encoding: gzip
