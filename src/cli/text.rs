@@ -1,7 +1,9 @@
 use core::fmt;
-use std::{path::PathBuf, str::FromStr};
+use std::{fs, path::PathBuf, str::FromStr};
 
 use clap::Parser;
+
+use crate::{process_text_generate, process_text_sign, process_text_verify, CmdExector};
 
 use super::{verify_file, verify_path};
 /// 文本加密/解密cli
@@ -84,5 +86,52 @@ impl fmt::Display for TextSignFormat {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         let fmt = Into::<&str>::into(*self);
         write!(f, "{}", fmt)
+    }
+}
+
+impl CmdExector for TextSignOpts {
+    async fn execute(self) -> anyhow::Result<()> {
+        let sign_str = process_text_sign(&self.input, &self.key, self.format)?;
+        println!("{}", sign_str);
+        Ok(())
+    }
+}
+
+impl CmdExector for TextVerifyOpts {
+    async fn execute(self) -> anyhow::Result<()> {
+        let verified = process_text_verify(&self.input, &self.key, self.format, &self.sig)?;
+        println!("{}", verified);
+        Ok(())
+    }
+}
+
+impl CmdExector for TextKeyGenerateOpts {
+    async fn execute(self) -> anyhow::Result<()> {
+        let key = process_text_generate(self.format)?;
+        // 此处需要根据不同类型，决定如何处理生成的密码
+        match self.format {
+            TextSignFormat::Blake3 => {
+                // 使用了Option<String> 使用下面的方法，后面改成PathBuf 可以直接使用 join
+                // let output_path = opts.output.map(|s| s + "/blake3.txt").unwrap();
+                let output_path = self.output.join("blake3.txt");
+                fs::write(output_path, &key[0])?;
+            }
+            TextSignFormat::Ed25519 => {
+                let name = &self.output;
+                fs::write(name.join("ed25519.sk"), &key[0])?;
+                fs::write(name.join("ed25519.pk"), &key[1])?;
+            }
+        }
+        Ok(())
+    }
+}
+
+impl CmdExector for TextSubCommand {
+    async fn execute(self) -> anyhow::Result<()> {
+        match self {
+            TextSubCommand::Sign(opts) => opts.execute().await,
+            TextSubCommand::Verify(opts) => opts.execute().await,
+            TextSubCommand::Generate(opts) => opts.execute().await,
+        }
     }
 }

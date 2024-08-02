@@ -1,4 +1,7 @@
+use crate::{process_decode, process_encode, CmdExector};
+
 use super::verify_file;
+use anyhow::Ok;
 use clap::Parser;
 use core::fmt;
 use std::str::FromStr;
@@ -72,5 +75,32 @@ impl fmt::Display for Base64Format {
         // 注意，调用此方法时，Base64Format必须实现 From 的 trait
         let fmt = Into::<&str>::into(*self);
         write!(f, "{}", fmt)
+    }
+}
+/// Base64 encoding executor trait implementation
+impl CmdExector for Base64EncodeOpts {
+    async fn execute(self) -> anyhow::Result<()> {
+        let encode_str = process_encode(&self.input, self.format)?;
+        println!("{}", encode_str);
+        Ok(())
+    }
+}
+
+impl CmdExector for Base64DecodeOpts {
+    async fn execute(self) -> anyhow::Result<()> {
+        let decode_vec = process_decode(&self.input, self.format)?;
+        // TODO : decoded data might not be string (but for this example, we assume it is)
+        let decoded = String::from_utf8(decode_vec)?;
+        println!("{}", decoded);
+        Ok(())
+    }
+}
+
+impl CmdExector for Base64SubCommand {
+    async fn execute(self) -> anyhow::Result<()> {
+        match self {
+            Base64SubCommand::Encode(opts) => opts.execute().await,
+            Base64SubCommand::Decode(opts) => opts.execute().await,
+        }
     }
 }

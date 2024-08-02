@@ -1,10 +1,13 @@
 use std::{fmt, str::FromStr};
 
+use crate::{process_csv, CmdExector};
 use clap::Parser;
+
 // 使用上层的包
 use super::verify_file;
 
 #[derive(Debug, Clone, Copy)]
+
 pub enum OutputFormat {
     Json,
     Yaml,
@@ -34,6 +37,18 @@ pub struct CsvOpts {
     // 参见详细的提示 Short option names must be unique for each argument, but '-h' is in use by both 'header' and 'help'
     #[arg(long, default_value_t = true)]
     pub header: bool,
+}
+
+impl CmdExector for CsvOpts {
+    async fn execute(self) -> anyhow::Result<()> {
+        let output = if let Some(output) = self.output {
+            output
+        } else {
+            // "output.json".into(),以{} format一个数据结构的话，那么这个数据结构就需要实现 Display Trait
+            format!("output.{}", self.format)
+        };
+        process_csv(&self.input, &output, self.format)
+    }
 }
 
 fn parser_format(format: &str) -> Result<OutputFormat, anyhow::Error> {

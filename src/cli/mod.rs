@@ -4,6 +4,8 @@ mod genpass;
 mod http;
 mod text;
 
+use crate::CmdExector;
+
 use self::{csv::CsvOpts, genpass::GenPassOpt};
 use clap::Parser;
 use std::path::{Path, PathBuf};
@@ -34,7 +36,7 @@ pub enum SubCommand {
     #[command(name = "genpass", about = "Generate a password")]
     GenPass(GenPassOpt),
 
-    #[command(name = "base64", subcommand)]
+    #[command(name = "base64", subcommand, about = "base64 encode and decode")]
     Base64(Base64SubCommand),
 
     #[command(name = "text", subcommand)]
@@ -42,6 +44,18 @@ pub enum SubCommand {
 
     #[command(name = "http", subcommand)]
     Http(HttpSubCommand),
+}
+
+impl CmdExector for SubCommand {
+    async fn execute(self) -> anyhow::Result<()> {
+        match self {
+            SubCommand::Csv(opts) => opts.execute().await,
+            SubCommand::GenPass(opts) => opts.execute().await,
+            SubCommand::Base64(opts) => opts.execute().await,
+            SubCommand::Text(opts) => opts.execute().await,
+            SubCommand::Http(opts) => opts.execute().await,
+        }
+    }
 }
 
 /**
