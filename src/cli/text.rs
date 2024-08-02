@@ -2,6 +2,7 @@ use core::fmt;
 use std::{fs, path::PathBuf, str::FromStr};
 
 use clap::Parser;
+use enum_dispatch::enum_dispatch;
 
 use crate::{process_text_generate, process_text_sign, process_text_verify, CmdExector};
 
@@ -9,6 +10,7 @@ use super::{verify_file, verify_path};
 /// 文本加密/解密cli
 
 #[derive(Debug, Parser)]
+#[enum_dispatch(CmdExector)]
 pub enum TextSubCommand {
     #[command(about = "Sign a message with aprivate/shared key")]
     Sign(TextSignOpts),
@@ -123,15 +125,5 @@ impl CmdExector for TextKeyGenerateOpts {
             }
         }
         Ok(())
-    }
-}
-
-impl CmdExector for TextSubCommand {
-    async fn execute(self) -> anyhow::Result<()> {
-        match self {
-            TextSubCommand::Sign(opts) => opts.execute().await,
-            TextSubCommand::Verify(opts) => opts.execute().await,
-            TextSubCommand::Generate(opts) => opts.execute().await,
-        }
     }
 }

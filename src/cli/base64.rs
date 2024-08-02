@@ -4,9 +4,11 @@ use super::verify_file;
 use anyhow::Ok;
 use clap::Parser;
 use core::fmt;
+use enum_dispatch::enum_dispatch;
 use std::str::FromStr;
 
 #[derive(Debug, Parser)]
+#[enum_dispatch(CmdExector)]
 pub enum Base64SubCommand {
     #[command(name = "encode", about = "Base64 a string to base64 encode")]
     Encode(Base64EncodeOpts),
@@ -93,14 +95,5 @@ impl CmdExector for Base64DecodeOpts {
         let decoded = String::from_utf8(decode_vec)?;
         println!("{}", decoded);
         Ok(())
-    }
-}
-
-impl CmdExector for Base64SubCommand {
-    async fn execute(self) -> anyhow::Result<()> {
-        match self {
-            Base64SubCommand::Encode(opts) => opts.execute().await,
-            Base64SubCommand::Decode(opts) => opts.execute().await,
-        }
     }
 }
